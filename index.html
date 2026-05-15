@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OnePDF — Toolkit PDF Lengkap & Gratis</title>
+<title>OnePDF</title>
 <meta name="description" content="Konversi gambar ke PDF, gabung, pisah, kompres, dan ekspor PDF ke gambar secara gratis. Semua diproses lokal — file tidak pernah diunggah ke server.">
 <meta name="theme-color" content="#E5231A">
 <meta property="og:title" content="OnePDF — Toolkit PDF Lengkap & Gratis">
@@ -460,9 +460,9 @@
     gap: 4px;
   }
 
-  .thumb-name { font-size: 11px; color: var(--text2); font-weight: 500; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .thumb-name { font-size: 11px; color: var(--text2); font-weight: 500; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  .thumb-actions { display: flex; gap: 3px; }
+  .thumb-actions { display: flex; gap: 3px; flex-shrink: 0; }
   .thumb-btn {
     width: 22px; height: 22px;
     border-radius: 5px;
@@ -660,8 +660,36 @@
     .btn i { margin: 0; }
     .btn { padding: 7px 10px; gap: 0; }
     .preset-grid { grid-template-columns: repeat(3, 1fr); }
+  
+    /* Mobile thumb footer fix */
+    .thumb-footer { padding: 5px 6px; gap: 6px; }
+    .thumb-name { font-size: 10px; min-width: 0; flex: 1; }
+    .thumb-actions { flex-shrink: 0; gap: 4px; }
+    .thumb-btn { width: 24px; height: 24px; font-size: 11px; flex-shrink: 0; }
+    .thumb-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+}
+
+  /* ── ANTI SELECT & PROTECTION ── */
+  body, .app, .sidebar, .main, .workspace, .view, .card, .drop-zone,
+  .thumb-card, .file-item, .nav-item, .topbar, .panel-row, .panel-col,
+  .ctrl-row, .ctrl-label, .chip, .preset-card, .settings-section-title,
+  .drop-title, .drop-sub, .logo-text, .topbar-title, .topbar-sub,
+  .empty-state, .sidebar-tip, .page-num-badge, .thumb-name {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+    -webkit-touch-callout: none !important;
   }
+  input, textarea, select, .page-input, [contenteditable="true"] {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+  }
+
 </style>
+<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 </head>
@@ -2095,5 +2123,128 @@ window.addEventListener('DOMContentLoaded', () => {
   }, 50);
 });
 </script>
+
+<script>
+/* ─── ANTI DEVTOOLS & CONTENT PROTECTION ───────────────── */
+(function() {
+  'use strict';
+
+  // Block context menu (right-click inspect)
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }, true);
+
+  // Block text selection globally (double protection)
+  document.addEventListener('selectstart', function(e) {
+    if (!['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName) && !e.target.isContentEditable) {
+      e.preventDefault();
+      return false;
+    }
+  }, true);
+
+  // Block copy/cut/paste
+  document.addEventListener('copy', function(e) {
+    if (!['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName) && !e.target.isContentEditable) {
+      e.preventDefault();
+      return false;
+    }
+  }, true);
+  document.addEventListener('cut', function(e) {
+    if (!['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName) && !e.target.isContentEditable) {
+      e.preventDefault();
+      return false;
+    }
+  }, true);
+  document.addEventListener('paste', function(e) {
+    if (!['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName) && !e.target.isContentEditable) {
+      e.preventDefault();
+      return false;
+    }
+  }, true);
+
+  // Block DevTools shortcuts
+  document.addEventListener('keydown', function(e) {
+    var key = e.key || e.keyCode;
+    var ctrl = e.ctrlKey || e.metaKey;
+    var shift = e.shiftKey;
+    var alt = e.altKey;
+
+    // F12
+    if (key === 'F12' || key === 123) { disabledEvent(e); }
+    // Ctrl+Shift+I (Inspect)
+    if (ctrl && shift && (key === 'I' || key === 73)) { disabledEvent(e); }
+    // Ctrl+Shift+J (Console)
+    if (ctrl && shift && (key === 'J' || key === 74)) { disabledEvent(e); }
+    // Ctrl+Shift+C (Inspect element)
+    if (ctrl && shift && (key === 'C' || key === 67)) { disabledEvent(e); }
+    // Ctrl+U (View source)
+    if (ctrl && (key === 'U' || key === 85)) { disabledEvent(e); }
+    // Ctrl+S (Save page)
+    if (ctrl && (key === 's' || key === 'S' || key === 83)) { disabledEvent(e); }
+    // Ctrl+P (Print)
+    if (ctrl && (key === 'p' || key === 'P' || key === 80)) { disabledEvent(e); }
+  }, true);
+
+  function disabledEvent(e) {
+    if (e.stopPropagation) e.stopPropagation();
+    if (window.event) window.event.cancelBubble = true;
+    e.preventDefault();
+    e.returnValue = false;
+    return false;
+  }
+
+  // Debugger trap: detect if DevTools is open via timing attack
+  var devtoolsOpen = false;
+  var threshold = 160;
+  setInterval(function() {
+    var start = performance.now();
+    debugger;
+    var end = performance.now();
+    if ((end - start) > threshold) {
+      if (!devtoolsOpen) {
+        devtoolsOpen = true;
+        try {
+          document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#000;color:#fff;font-size:18px;font-weight:700;">Akses ditolak</div>';
+        } catch(err) {}
+        setTimeout(function() {
+          window.location.href = window.location.href;
+        }, 100);
+      }
+    } else {
+      devtoolsOpen = false;
+    }
+  }, 200);
+
+  // Detect DevTools via window size anomaly
+  setInterval(function() {
+    var widthThreshold = window.outerWidth - window.innerWidth > 160;
+    var heightThreshold = window.outerHeight - window.innerHeight > 160;
+    if (widthThreshold || heightThreshold) {
+      try {
+        document.body.innerHTML = '';
+        window.location.reload();
+      } catch(err) {}
+    }
+  }, 1000);
+
+  // Prevent console clearing bypass
+  var _clear = console.clear;
+  console.clear = function() {
+    // silently block
+  };
+
+  // Disable console methods partially
+  ['log','warn','info','error','debug','table','dir'].forEach(function(m) {
+    var orig = console[m];
+    console[m] = function() {
+      // allow but could be restricted if needed
+      if (orig) return orig.apply(console, arguments);
+    };
+  });
+})();
+</script>
+
 </body>
 </html>
