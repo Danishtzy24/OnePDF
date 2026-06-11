@@ -1,0 +1,11 @@
+{
+  "name": "OnePDF",
+  "short_name": "OnePDF",
+  "description": "Toolkit PDF lokal untuk konversi, pengaturan, dan ekstraksi dokumen.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#E5231A",
+  "lang": "id"
+}
