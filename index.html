@@ -6,6 +6,7 @@
 <title>OnePDF</title>
 <meta name="description" content="Konversi gambar ke PDF, gabung, pisah, kompres, dan ekspor PDF ke gambar secara gratis. Semua diproses lokal — file tidak pernah diunggah ke server.">
 <meta name="theme-color" content="#E5231A">
+<link rel="manifest" href="manifest.json">
 <meta property="og:title" content="OnePDF — Toolkit PDF Lengkap & Gratis">
 <meta property="og:description" content="Tools PDF gratis: Image to PDF, Merge, Split, Compress, PDF to Image. 100% lokal, privasi terjaga.">
 <meta property="og:type" content="website">
@@ -690,8 +691,6 @@
 
 </style>
 <base target="_blank">
-<base target="_blank">
-<base target="_blank">
 </head>
 <body>
 <div class="app">
@@ -733,6 +732,14 @@
       <div class="nav-item" data-view="pdf2img">
         <span class="nav-icon"><i class="fa-solid fa-images"></i></span>
         <span>PDF ke Gambar</span>
+      </div>
+      <div class="nav-item" data-view="organize">
+        <span class="nav-icon"><i class="fa-solid fa-table-cells-large"></i></span>
+        <span>Atur PDF</span>
+      </div>
+      <div class="nav-item" data-view="pdf2text">
+        <span class="nav-icon"><i class="fa-solid fa-file-lines"></i></span>
+        <span>PDF ke Teks</span>
       </div>
 
       <div class="sidebar-divider"></div>
@@ -967,7 +974,7 @@
         <div id="compress-panel" style="display:none;">
           <div class="panel-row">
             <div class="panel-col main-col">
-              <div class="card">
+              <div class="card" style="display:none;">
                 <div class="card-header"><i class="fa-solid fa-gauge-high"></i> Preset Kompresi</div>
                 <div class="card-body">
                   <div class="preset-grid">
@@ -994,17 +1001,17 @@
                 <div class="card-header"><i class="fa-solid fa-sliders"></i> Pengaturan Lanjutan</div>
                 <div class="card-body" style="padding:8px 16px;">
                   <div class="ctrl-row">
-                    <div><div class="ctrl-label">Kualitas Gambar</div><div class="ctrl-sub" id="compress-quality-label">70%</div></div>
+                    <div><div class="ctrl-label">Mode Optimasi</div><div class="ctrl-sub" id="compress-quality-label">Lossless</div></div>
                   </div>
                   <div class="slider-wrap" style="margin-top:6px;">
-                    <input type="range" class="slider" id="compress-quality" min="10" max="100" value="70" oninput="document.getElementById('compress-quality-label').textContent=this.value+'%'">
+                    <input type="range" class="slider" id="compress-quality" min="10" max="100" value="70" disabled>
                   </div>
                   <div class="ctrl-row" style="margin-top:10px;">
                     <div class="ctrl-label">Hapus Metadata</div>
                     <label class="toggle"><input type="checkbox" id="remove-metadata" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
                   </div>
                   <div class="ctrl-row">
-                    <div class="ctrl-label">Ratakan Anotasi</div>
+                    <div class="ctrl-label">Ratakan Form</div>
                     <label class="toggle"><input type="checkbox" id="flatten-annot"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
                   </div>
                 </div>
@@ -1082,8 +1089,8 @@
                     <div class="ctrl-row">
                       <div><div class="ctrl-label">Mode Ekspor</div></div>
                       <select class="select-ctrl" id="pdf2img-mode">
+                        <option value="zip">ZIP Archive (disarankan)</option>
                         <option value="individual">File Terpisah</option>
-                        <option value="zip">ZIP Archive</option>
                       </select>
                     </div>
                     <div class="ctrl-row">
@@ -1108,6 +1115,58 @@
       </div>
 
       <!-- ═══ SETTINGS ═══ -->
+      <div class="view" id="view-organize">
+        <div class="drop-zone" id="drop-organize" onclick="document.getElementById('file-organize').click()">
+          <div class="drop-icon"><i class="fa-solid fa-table-cells-large"></i></div>
+          <div class="drop-title">Letakkan PDF untuk diatur</div>
+          <div class="drop-sub">Ubah urutan, putar, hapus, beri watermark, dan nomor halaman</div>
+        </div>
+        <input type="file" id="file-organize" accept="application/pdf" onchange="handleOrganizeFile(this.files[0])">
+        <div id="organize-panel" style="display:none;">
+          <div class="panel-row">
+            <div class="panel-col main-col">
+              <div class="card">
+                <div class="card-header"><i class="fa-solid fa-table-cells-large"></i> Halaman <span id="organize-count" class="chip chip-gray" style="margin-left:auto;text-transform:none;letter-spacing:0;"></span></div>
+                <div class="card-body"><div class="thumb-grid" id="organize-grid"></div></div>
+              </div>
+            </div>
+            <div class="panel-col side-col">
+              <div class="card">
+                <div class="card-header"><i class="fa-solid fa-stamp"></i> Branding</div>
+                <div class="card-body" style="padding:8px 16px;">
+                  <div class="ctrl-row"><div class="ctrl-label">Watermark</div></div>
+                  <input type="text" class="page-input" id="organize-watermark" placeholder="Contoh: DOKUMEN RAHASIA" style="width:100%;margin-bottom:10px;">
+                  <div class="ctrl-row">
+                    <div><div class="ctrl-label">Nomor Halaman</div><div class="ctrl-sub">Halaman X dari Y</div></div>
+                    <label class="toggle"><input type="checkbox" id="organize-page-numbers"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                  </div>
+                  <div class="ctrl-row"><div class="ctrl-label">Nama Output</div></div>
+                  <input type="text" class="page-input" id="organize-output-name" value="organized" style="width:100%;">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="view" id="view-pdf2text">
+        <div class="drop-zone" id="drop-pdf2text" onclick="document.getElementById('file-pdf2text').click()">
+          <div class="drop-icon"><i class="fa-solid fa-file-lines"></i></div>
+          <div class="drop-title">Letakkan PDF untuk diekstrak</div>
+          <div class="drop-sub">Mengambil teks tertanam dari setiap halaman PDF</div>
+        </div>
+        <input type="file" id="file-pdf2text" accept="application/pdf" onchange="handlePdf2TextFile(this.files[0])">
+        <div id="pdf2text-panel" style="display:none;">
+          <div class="card">
+            <div class="card-header"><i class="fa-solid fa-align-left"></i> Hasil Ekstraksi <span id="pdf2text-info" class="chip chip-gray" style="margin-left:auto;text-transform:none;letter-spacing:0;"></span></div>
+            <div class="card-body">
+              <textarea id="pdf2text-output" class="page-input" style="width:100%;min-height:420px;resize:vertical;line-height:1.6;" placeholder="Teks hasil ekstraksi akan muncul di sini."></textarea>
+              <input type="text" id="pdf2text-output-name" class="page-input" value="extracted-text" style="width:220px;margin-top:12px;">
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="view" id="view-settings">
         <div class="panel-row" style="align-items:flex-start;">
           <div class="panel-col" style="flex:1; gap:16px; display:flex; flex-direction:column;">
@@ -1221,13 +1280,15 @@ if (typeof pdfjsLib !== 'undefined') {
 
 // ─── STATE ────────────────────────────────────────────
 let state = {
-  images: [],       // { file, dataUrl, rotation }
+  images: [],       // { file, objectUrl, rotation }
   mergeFiles: [],   // { file, name, size }
   splitFile: null,
   splitPdfDoc: null,
   compressFile: null,
   compressPdfDoc: null,
   pdf2img: { file: null, pdf: null, pages: [] }, // { num, selected, thumbUrl }
+  organize: { file: null, sourceBytes: null, pages: [] },
+  pdf2text: { file: null, text: '' },
   fitMode: 'fill',
   splitMode: 'range',
   splitRanges: [],
@@ -1240,6 +1301,8 @@ const viewMeta = {
   'split':    { title: 'Pisah PDF',       sub: 'Ekstrak halaman tertentu',            exportLabel: 'Pisah PDF' },
   'compress': { title: 'Kompres PDF',     sub: 'Kurangi ukuran file PDF',             exportLabel: 'Kompres PDF' },
   'pdf2img':  { title: 'PDF ke Gambar',   sub: 'Ekspor halaman PDF menjadi gambar',   exportLabel: 'Ekspor Gambar' },
+  'organize': { title: 'Atur PDF',         sub: 'Urutkan, putar, hapus, dan beri branding', exportLabel: 'Ekspor PDF' },
+  'pdf2text': { title: 'PDF ke Teks',      sub: 'Ekstrak teks tertanam dari PDF', exportLabel: 'Unduh TXT' },
   'settings': { title: 'Pengaturan',      sub: 'Konfigurasi preferensi aplikasi',     exportLabel: 'Simpan' },
 };
 
@@ -1293,18 +1356,15 @@ setupDrop('drop-merge', files => handleMergeFiles(files), /application\/pdf/);
 setupDrop('drop-split', files => handleSplitFile(files[0]), /application\/pdf/);
 setupDrop('drop-compress', files => handleCompressFile(files[0]), /application\/pdf/);
 setupDrop('drop-pdf2img', files => handlePdf2ImgFile(files[0]), /application\/pdf/);
+setupDrop('drop-organize', files => handleOrganizeFile(files[0]), /application\/pdf/);
+setupDrop('drop-pdf2text', files => handlePdf2TextFile(files[0]), /application\/pdf/);
 
 // ─── IMAGE TO PDF ──────────────────────────────────────
 function handleImages(files) {
-  const arr = [...files];
-  arr.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      state.images.push({ file, dataUrl: e.target.result, rotation: 0 });
-      renderThumbs();
-    };
-    reader.readAsDataURL(file);
+  [...files].filter(file => file.type.startsWith('image/')).forEach(file => {
+    state.images.push({ file, objectUrl: URL.createObjectURL(file), rotation: 0 });
   });
+  renderThumbs();
   document.getElementById('img-panel').style.display = 'flex';
   document.getElementById('drop-img').style.display = 'none';
 }
@@ -1318,7 +1378,7 @@ function renderThumbs() {
     card.dataset.index = i;
     card.innerHTML = `
       <div class="thumb-img-wrap">
-        <img src="${img.dataUrl}" style="transform: rotate(${img.rotation}deg); transition: transform 0.2s;">
+        <img src="${img.objectUrl}" style="transform: rotate(${img.rotation}deg); transition: transform 0.2s;">
       </div>
       <div class="thumb-footer">
         <span class="thumb-name">${img.file.name}</span>
@@ -1358,6 +1418,7 @@ function rotateImg(i) {
 }
 
 function removeImg(i) {
+  URL.revokeObjectURL(state.images[i].objectUrl);
   state.images.splice(i, 1);
   if (!state.images.length) {
     document.getElementById('img-panel').style.display = 'none';
@@ -1622,6 +1683,7 @@ async function exportPdf2Img() {
       folder.file(filename, blob);
     } else {
       downloadBlob(blob, filename);
+      await new Promise(resolve => setTimeout(resolve, 350));
     }
   }
 
@@ -1638,17 +1700,163 @@ async function exportPdf2Img() {
 }
 
 // ─── CLEAR ─────────────────────────────────────────────
+async function handleOrganizeFile(file) {
+  if (!file) return;
+  clearOrganizeUrls();
+  setStatus('processing', 'Membuat pratinjau...');
+  const sourceBytes = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: sourceBytes.slice(0) }).promise;
+  state.organize = { file, sourceBytes, pages: [] };
+  for (let num = 1; num <= pdf.numPages; num++) {
+    const canvas = await renderPdfPageToCanvas(pdf, num, 0.3);
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.75));
+    state.organize.pages.push({ sourceIndex: num - 1, rotation: 0, thumbUrl: URL.createObjectURL(blob) });
+  }
+  renderOrganizePages();
+  document.getElementById('organize-panel').style.display = '';
+  document.getElementById('drop-organize').style.display = 'none';
+  setStatus('ready');
+}
+
+function renderOrganizePages() {
+  const grid = document.getElementById('organize-grid');
+  grid.innerHTML = '';
+  state.organize.pages.forEach((page, index) => {
+    const card = document.createElement('div');
+    card.className = 'thumb-card animate-in';
+    card.innerHTML = `
+      <div class="thumb-img-wrap">
+        <img src="${page.thumbUrl}" style="transform:rotate(${page.rotation}deg);transition:transform .2s;">
+        <div class="page-num-badge">${index + 1}</div>
+      </div>
+      <div class="thumb-footer">
+        <span class="thumb-name">Halaman ${page.sourceIndex + 1}</span>
+        <div class="thumb-actions">
+          <button class="thumb-btn" onclick="rotateOrganizePage(${index})" title="Putar"><i class="fa-solid fa-rotate-right"></i></button>
+          <button class="thumb-btn" onclick="removeOrganizePage(${index})" title="Hapus"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+  document.getElementById('organize-count').textContent = state.organize.pages.length + ' halaman';
+  if (window._organizeSort) window._organizeSort.destroy();
+  window._organizeSort = new Sortable(grid, {
+    animation: 150,
+    ghostClass: 'sortable-ghost',
+    chosenClass: 'sortable-chosen',
+    onEnd(evt) {
+      const moved = state.organize.pages.splice(evt.oldIndex, 1)[0];
+      state.organize.pages.splice(evt.newIndex, 0, moved);
+      renderOrganizePages();
+    }
+  });
+}
+
+function rotateOrganizePage(index) {
+  state.organize.pages[index].rotation = (state.organize.pages[index].rotation + 90) % 360;
+  renderOrganizePages();
+}
+
+function removeOrganizePage(index) {
+  URL.revokeObjectURL(state.organize.pages[index].thumbUrl);
+  state.organize.pages.splice(index, 1);
+  renderOrganizePages();
+}
+
+function clearOrganizeUrls() {
+  state.organize.pages.forEach(page => URL.revokeObjectURL(page.thumbUrl));
+}
+
+async function exportOrganizePDF() {
+  if (!state.organize.sourceBytes || !state.organize.pages.length) throw new Error('Muat PDF dan sisakan minimal satu halaman.');
+  const source = await PDFLib.PDFDocument.load(state.organize.sourceBytes.slice(0));
+  const output = await PDFLib.PDFDocument.create();
+  const watermark = document.getElementById('organize-watermark').value.trim();
+  const addNumbers = document.getElementById('organize-page-numbers').checked;
+  const font = await output.embedFont(PDFLib.StandardFonts.Helvetica);
+  const copied = await output.copyPages(source, state.organize.pages.map(page => page.sourceIndex));
+  copied.forEach((page, index) => {
+    const current = page.getRotation().angle || 0;
+    page.setRotation(PDFLib.degrees((current + state.organize.pages[index].rotation) % 360));
+    const { width, height } = page.getSize();
+    if (watermark) {
+      const size = Math.max(20, Math.min(54, width / Math.max(7, watermark.length * 0.55)));
+      const textWidth = font.widthOfTextAtSize(watermark, size);
+      page.drawText(watermark, {
+        x: (width - textWidth) / 2, y: height / 2, size, font,
+        color: PDFLib.rgb(0.65, 0.65, 0.65), opacity: 0.28,
+        rotate: PDFLib.degrees(35)
+      });
+    }
+    if (addNumbers) {
+      const label = `Halaman ${index + 1} dari ${copied.length}`;
+      const size = 9;
+      page.drawText(label, {
+        x: width - font.widthOfTextAtSize(label, size) - 24, y: 18,
+        size, font, color: PDFLib.rgb(0.35, 0.35, 0.35)
+      });
+    }
+    output.addPage(page);
+  });
+  const bytes = await output.save({ useObjectStreams: true });
+  downloadBytes(bytes, (document.getElementById('organize-output-name').value || 'organized') + '.pdf', 'application/pdf');
+  showToast('PDF berhasil diatur.', 'success');
+}
+
+async function handlePdf2TextFile(file) {
+  if (!file) return;
+  setStatus('processing', 'Mengekstrak teks...');
+  const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+  const pages = [];
+  for (let num = 1; num <= pdf.numPages; num++) {
+    const page = await pdf.getPage(num);
+    const content = await page.getTextContent();
+    let line = '';
+    let lastY = null;
+    const lines = [];
+    content.items.forEach(item => {
+      const y = Math.round(item.transform[5]);
+      if (lastY !== null && Math.abs(y - lastY) > 3 && line.trim()) {
+        lines.push(line.trim());
+        line = '';
+      }
+      line += (line ? ' ' : '') + item.str;
+      lastY = y;
+    });
+    if (line.trim()) lines.push(line.trim());
+    pages.push(`--- Halaman ${num} ---\n${lines.join('\n')}`);
+    setStatus('processing', `Mengekstrak ${num}/${pdf.numPages}...`);
+  }
+  state.pdf2text = { file, text: pages.join('\n\n') };
+  document.getElementById('pdf2text-output').value = state.pdf2text.text;
+  document.getElementById('pdf2text-info').textContent = pdf.numPages + ' halaman';
+  document.getElementById('pdf2text-panel').style.display = '';
+  document.getElementById('drop-pdf2text').style.display = 'none';
+  setStatus('ready');
+  showToast(state.pdf2text.text.trim() ? 'Teks berhasil diekstrak.' : 'Tidak ada teks tertanam. PDF mungkin hasil scan.', state.pdf2text.text.trim() ? 'success' : '');
+}
+
+function exportPdf2Text() {
+  const text = document.getElementById('pdf2text-output').value;
+  if (!text.trim()) throw new Error('Tidak ada teks untuk diunduh.');
+  downloadBlob(new Blob(['\uFEFF' + text], { type: 'text/plain;charset=utf-8' }), (document.getElementById('pdf2text-output-name').value || 'extracted-text') + '.txt');
+  showToast('File teks berhasil diunduh.', 'success');
+}
+
 function clearAll() {
   const v = state.currentView;
   const hasData = (v === 'img2pdf' && state.images.length) ||
     (v === 'merge' && state.mergeFiles.length) ||
     (v === 'split' && state.splitFile) ||
     (v === 'compress' && state.compressFile) ||
-    (v === 'pdf2img' && state.pdf2img.file);
+    (v === 'pdf2img' && state.pdf2img.file) ||
+    (v === 'organize' && state.organize.file) ||
+    (v === 'pdf2text' && state.pdf2text.file);
   if (!hasData) return;
   if (!confirm('Hapus semua file yang sudah dimuat?')) return;
 
   if (v === 'img2pdf') {
+    state.images.forEach(image => URL.revokeObjectURL(image.objectUrl));
     state.images = [];
     document.getElementById('img-panel').style.display = 'none';
     document.getElementById('drop-img').style.display = '';
@@ -1676,6 +1884,19 @@ function clearAll() {
     document.getElementById('drop-pdf2img').style.display = '';
     document.getElementById('file-pdf2img').value = '';
     document.getElementById('pdf2img-grid').innerHTML = '';
+  } else if (v === 'organize') {
+    clearOrganizeUrls();
+    state.organize = { file: null, sourceBytes: null, pages: [] };
+    document.getElementById('organize-panel').style.display = 'none';
+    document.getElementById('drop-organize').style.display = '';
+    document.getElementById('file-organize').value = '';
+    document.getElementById('organize-grid').innerHTML = '';
+  } else if (v === 'pdf2text') {
+    state.pdf2text = { file: null, text: '' };
+    document.getElementById('pdf2text-panel').style.display = 'none';
+    document.getElementById('drop-pdf2text').style.display = '';
+    document.getElementById('file-pdf2text').value = '';
+    document.getElementById('pdf2text-output').value = '';
   }
   showToast('Data dihapus.', '');
 }
@@ -1694,6 +1915,8 @@ async function handleExport() {
     else if (v === 'split') await exportSplitPDF();
     else if (v === 'compress') await exportCompressPDF();
     else if (v === 'pdf2img') await exportPdf2Img();
+    else if (v === 'organize') await exportOrganizePDF();
+    else if (v === 'pdf2text') exportPdf2Text();
     setStatus('done');
   } catch (e) {
     showToast('Error: ' + e.message, 'error');
@@ -1743,6 +1966,15 @@ async function rotateImageDataUrl(dataUrl, rotation) {
   });
 }
 
+function blobToDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
 async function exportImageToPDF() {
   if (!state.images.length) { showToast('Tambahkan minimal satu gambar.', 'error'); throw new Error('No images'); }
 
@@ -1762,9 +1994,9 @@ async function exportImageToPDF() {
     const img = state.images[i];
     fill.style.width = ((i / state.images.length) * 90) + '%';
 
-    let finalDataUrl = img.dataUrl;
+    let finalDataUrl = await blobToDataUrl(img.file);
     if (img.rotation !== 0) {
-      finalDataUrl = await rotateImageDataUrl(img.dataUrl, img.rotation);
+      finalDataUrl = await rotateImageDataUrl(finalDataUrl, img.rotation);
     }
 
     let pageW, pageH;
@@ -1887,70 +2119,45 @@ function parsePageRanges(str, total) {
 
 // ─── COMPRESS ENGINE ───────────────────────────────────
 async function exportCompressPDF() {
-  if (!state.compressFile || !state.compressPdfDoc) { showToast('Muat PDF terlebih dahulu.', 'error'); throw new Error('No file'); }
-
-  const quality = parseInt(document.getElementById('compress-quality').value) / 100;
+  if (!state.compressFile || !state.compressPdfDoc) {
+    showToast('Muat PDF terlebih dahulu.', 'error');
+    throw new Error('No file');
+  }
   const removeMeta = document.getElementById('remove-metadata').checked;
   const flatten = document.getElementById('flatten-annot').checked;
   const outName = (document.getElementById('compress-output-name').value || 'compressed') + '.pdf';
-
-  // Load with PDF.js for rendering
-  const buf = await state.compressFile.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-  const totalPages = pdf.numPages;
-
-  const outDoc = await PDFLib.PDFDocument.create();
+  const outDoc = await PDFLib.PDFDocument.load(await state.compressFile.arrayBuffer(), {
+    updateMetadata: false
+  });
   if (removeMeta) {
-    outDoc.setTitle(''); outDoc.setAuthor(''); outDoc.setSubject(''); outDoc.setKeywords([]);
-    outDoc.setCreator('OnePDF'); outDoc.setProducer('OnePDF');
+    outDoc.setTitle('');
+    outDoc.setAuthor('');
+    outDoc.setSubject('');
+    outDoc.setKeywords([]);
+    outDoc.setCreator('OnePDF');
+    outDoc.setProducer('OnePDF');
   }
-
-  // Progress
-  const progressWrap = document.getElementById('compress-progress-wrap');
-  const progressFill = document.getElementById('compress-progress-fill');
-  if (progressWrap) progressWrap.style.display = '';
-
-  for (let i = 1; i <= totalPages; i++) {
-    if (progressFill) progressFill.style.width = Math.round(((i - 1) / totalPages) * 100) + '%';
-    setStatus('processing', `Mengkompres halaman ${i}/${totalPages}...`);
-
-    const page = await pdf.getPage(i);
-    const viewport = page.getViewport({ scale: 1.5 });
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-
-    // White background for transparent pages
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    await page.render({ canvasContext: ctx, viewport }).promise;
-
-    // Convert to compressed JPEG blob
-    const imgBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
-    const imgBytes = await imgBlob.arrayBuffer();
-
-    // Embed into new PDF
-    const jpgImage = await outDoc.embedJpg(imgBytes);
-    const pageW = canvas.width * 0.75; // px to pt (72 dpi base, 96/72 ≈ 0.75 correction for display)
-    const pageH = canvas.height * 0.75;
-    const newPage = outDoc.addPage([pageW, pageH]);
-    newPage.drawImage(jpgImage, {
-      x: 0, y: 0,
-      width: pageW, height: pageH,
-    });
+  if (flatten) {
+    try {
+      outDoc.getForm().flatten();
+    } catch (error) {
+      console.warn('Tidak ada form yang dapat diratakan.', error);
+    }
   }
-
-  if (progressFill) progressFill.style.width = '100%';
-  const bytes = await outDoc.save({ useObjectStreams: true });
+  setStatus('processing', 'Mengoptimalkan struktur PDF...');
+  const bytes = await outDoc.save({
+    useObjectStreams: true,
+    addDefaultPage: false,
+    objectsPerTick: 40
+  });
   const ratio = Math.round((1 - bytes.length / state.compressFile.size) * 100);
   downloadBytes(bytes, outName, 'application/pdf');
-  showToast(ratio > 0 ? `Dikompres ${ratio}% lebih kecil.` : 'PDF sudah optimal.', ratio > 0 ? 'success' : '');
-
-  if (progressWrap) {
-    setTimeout(() => { progressWrap.style.display = 'none'; if (progressFill) progressFill.style.width = '0%'; }, 800);
-  }
+  showToast(
+    ratio > 0
+      ? `Dioptimalkan ${ratio}% lebih kecil tanpa meraster teks.`
+      : 'PDF sudah optimal; teks dan link tetap dipertahankan.',
+    ratio > 0 ? 'success' : ''
+  );
 }
 
 // ─── SETTINGS ──────────────────────────────────────────
@@ -2101,8 +2308,8 @@ document.addEventListener('keydown', e => {
     e.preventDefault();
     if (state.currentView !== 'settings') clearAll();
   }
-  const views = ['img2pdf','merge','split','compress','pdf2img','settings'];
-  if ((e.ctrlKey || e.metaKey) && e.key >= '1' && e.key <= '6') {
+  const views = ['img2pdf','merge','split','compress','pdf2img','organize','pdf2text','settings'];
+  if ((e.ctrlKey || e.metaKey) && e.key >= '1' && e.key <= '8') {
     e.preventDefault();
     switchView(views[parseInt(e.key) - 1]);
   }
@@ -2121,129 +2328,10 @@ window.addEventListener('DOMContentLoaded', () => {
     const compressSlider = document.getElementById('compress-quality');
     if (compressSlider) updateSliderTrack(compressSlider);
   }, 50);
-});
-</script>
-
-<script>
-/* ─── ANTI DEVTOOLS & CONTENT PROTECTION ───────────────── */
-(function() {
-  'use strict';
-
-  // Block context menu (right-click inspect)
-  document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    return false;
-  }, true);
-
-  // Block text selection globally (double protection)
-  document.addEventListener('selectstart', function(e) {
-    if (!['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName) && !e.target.isContentEditable) {
-      e.preventDefault();
-      return false;
-    }
-  }, true);
-
-  // Block copy/cut/paste
-  document.addEventListener('copy', function(e) {
-    if (!['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName) && !e.target.isContentEditable) {
-      e.preventDefault();
-      return false;
-    }
-  }, true);
-  document.addEventListener('cut', function(e) {
-    if (!['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName) && !e.target.isContentEditable) {
-      e.preventDefault();
-      return false;
-    }
-  }, true);
-  document.addEventListener('paste', function(e) {
-    if (!['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName) && !e.target.isContentEditable) {
-      e.preventDefault();
-      return false;
-    }
-  }, true);
-
-  // Block DevTools shortcuts
-  document.addEventListener('keydown', function(e) {
-    var key = e.key || e.keyCode;
-    var ctrl = e.ctrlKey || e.metaKey;
-    var shift = e.shiftKey;
-    var alt = e.altKey;
-
-    // F12
-    if (key === 'F12' || key === 123) { disabledEvent(e); }
-    // Ctrl+Shift+I (Inspect)
-    if (ctrl && shift && (key === 'I' || key === 73)) { disabledEvent(e); }
-    // Ctrl+Shift+J (Console)
-    if (ctrl && shift && (key === 'J' || key === 74)) { disabledEvent(e); }
-    // Ctrl+Shift+C (Inspect element)
-    if (ctrl && shift && (key === 'C' || key === 67)) { disabledEvent(e); }
-    // Ctrl+U (View source)
-    if (ctrl && (key === 'U' || key === 85)) { disabledEvent(e); }
-    // Ctrl+S (Save page)
-    if (ctrl && (key === 's' || key === 'S' || key === 83)) { disabledEvent(e); }
-    // Ctrl+P (Print)
-    if (ctrl && (key === 'p' || key === 'P' || key === 80)) { disabledEvent(e); }
-  }, true);
-
-  function disabledEvent(e) {
-    if (e.stopPropagation) e.stopPropagation();
-    if (window.event) window.event.cancelBubble = true;
-    e.preventDefault();
-    e.returnValue = false;
-    return false;
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    navigator.serviceWorker.register('./sw.js').catch(error => console.warn('Service worker gagal didaftarkan.', error));
   }
-
-  // Debugger trap: detect if DevTools is open via timing attack
-  var devtoolsOpen = false;
-  var threshold = 160;
-  setInterval(function() {
-    var start = performance.now();
-    debugger;
-    var end = performance.now();
-    if ((end - start) > threshold) {
-      if (!devtoolsOpen) {
-        devtoolsOpen = true;
-        try {
-          document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#000;color:#fff;font-size:18px;font-weight:700;">Akses ditolak</div>';
-        } catch(err) {}
-        setTimeout(function() {
-          window.location.href = window.location.href;
-        }, 100);
-      }
-    } else {
-      devtoolsOpen = false;
-    }
-  }, 200);
-
-  // Detect DevTools via window size anomaly
-  setInterval(function() {
-    var widthThreshold = window.outerWidth - window.innerWidth > 160;
-    var heightThreshold = window.outerHeight - window.innerHeight > 160;
-    if (widthThreshold || heightThreshold) {
-      try {
-        document.body.innerHTML = '';
-        window.location.reload();
-      } catch(err) {}
-    }
-  }, 1000);
-
-  // Prevent console clearing bypass
-  var _clear = console.clear;
-  console.clear = function() {
-    // silently block
-  };
-
-  // Disable console methods partially
-  ['log','warn','info','error','debug','table','dir'].forEach(function(m) {
-    var orig = console[m];
-    console[m] = function() {
-      // allow but could be restricted if needed
-      if (orig) return orig.apply(console, arguments);
-    };
-  });
-})();
+});
 </script>
 
 </body>
